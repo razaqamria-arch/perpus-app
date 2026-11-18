@@ -1,31 +1,32 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Inertia;
-use App\Http\Controllers\HomeController;
+use Inertia\Inertia;
+
+// Memanggil Controller
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\MemberController;
 
 // Halaman utama
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', function () {
+    return redirect()->route('dashboard');
+});
 
-// Halaman tentang
-Route::get('/tentang', [HomeController::class, 'tentang']);
-
-// Halaman kontak
-Route::get('/kontak', [HomeController::class, 'kontak']);
-
-// Route yang membutuhkan login
+// Route Dashboard dan CRUD
 Route::middleware(['auth'])->group(function () {
 
-    // Route Dashboard
+    // Halaman Dashboard
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    // CRUD Buku
+    // CRUD Data Buku
     Route::resource('books', BookController::class);
+
+    // CRUD Data Anggota
+    Route::resource('members', MemberController::class);
 
 });
 
-// Autentikasi
+// Route autentikasi
 require __DIR__.'/auth.php';
