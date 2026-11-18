@@ -8,29 +8,37 @@ use Inertia\Inertia;
 
 class BookController extends Controller
 {
-    /**
-     * Menampilkan daftar buku.
-     */
-    public function index()
+    // 1. Menampilkan daftar buku dan fitur pencarian
+    public function index(Request $request)
     {
-        $books = Book::latest()->paginate(10);
+        $books = Book::when($request->filled('search'), function ($query) use ($request) {
+
+            $search = $request->search;
+
+            // Mencari berdasarkan judul atau pengarang
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                  ->orWhere('pengarang', 'like', "%{$search}%");
+            });
+
+        })
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
 
         return Inertia::render('Books/Index', [
             'books' => $books,
+            'search' => $request->search,
         ]);
     }
 
-    /**
-     * Menampilkan form tambah buku.
-     */
+    // 2. Menampilkan form tambah buku
     public function create()
     {
         return Inertia::render('Books/Create');
     }
 
-    /**
-     * Menyimpan buku baru.
-     */
+    // 3. Menyimpan buku baru
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -49,9 +57,7 @@ class BookController extends Controller
             ->with('success', 'Buku berhasil ditambahkan.');
     }
 
-    /**
-     * Menampilkan detail buku.
-     */
+    // 4. Menampilkan detail buku
     public function show(Book $book)
     {
         return Inertia::render('Books/Show', [
@@ -59,9 +65,7 @@ class BookController extends Controller
         ]);
     }
 
-    /**
-     * Menampilkan form edit buku.
-     */
+    // 5. Menampilkan form edit buku
     public function edit(Book $book)
     {
         return Inertia::render('Books/Edit', [
@@ -69,9 +73,7 @@ class BookController extends Controller
         ]);
     }
 
-    /**
-     * Memperbarui data buku.
-     */
+    // 6. Memperbarui data buku
     public function update(Request $request, Book $book)
     {
         $validated = $request->validate([
@@ -90,9 +92,7 @@ class BookController extends Controller
             ->with('success', 'Buku berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus buku.
-     */
+    // 7. Menghapus data buku
     public function destroy(Book $book)
     {
         $book->delete();
