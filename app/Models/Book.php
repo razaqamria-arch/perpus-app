@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\Hasfactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'kode_buku',
         'judul',
@@ -15,7 +17,6 @@ class Book extends Model
         'tahun',
         'stok',
     ];
-    use Hasfactory;
 
     public function loans()
     {
